@@ -33,7 +33,7 @@ pub struct BufferedSource {
     /// The "waiting room" for the background task.
     /// If the prefetch buffer reaches its capacity, the worker will park the `DecodeTask`
     /// here to prevent thread blocking and free up the worker for other streams.
-    suspended_task: Arc<Mutex<Option<DecodeTask>>>,
+    pub(crate) suspended_task: Arc<Mutex<Option<DecodeTask>>>,
 
     /// The global dispatcher channel of the thread pool.
     /// Used by this frontend consumer to wake up the suspended task and push it back

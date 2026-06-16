@@ -1,13 +1,14 @@
 use anyhow::Result;
 use directories::ProjectDirs;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize, Serializer};
+use std::collections::{HashMap, BTreeMap};
 use std::fs;
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Preset {
     pub name: String,
+    #[serde(serialize_with = "serialize_ordered_map")]
     // sound_id -> volume (if present, sound is active at this volume)
     pub sounds: HashMap<String, f32>,
 }
@@ -48,3 +49,15 @@ fn get_presets_path() -> Result<PathBuf> {
         Ok(PathBuf::from("presets.toml"))
     }
 }
+
+fn serialize_ordered_map<S>(
+    map: &HashMap<String, f32>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let ordered: BTreeMap<_, _> = map.iter().collect();
+    ordered.serialize(serializer)
+}
+
